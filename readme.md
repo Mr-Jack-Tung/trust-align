@@ -20,7 +20,7 @@ LLMs are an integral part of retrieval-augmented generation (RAG) systems. While
 
   - [Requirements](#requirements)
   - [Data](#data)
-  - [TRUST-SCORE-Eval](#trust-score-eval)
+  - [TRUST-SCORE](#trust-score)
   - [TRUST-ALGIN](#trust-algin)
   - [Bug or Questions](#bug-or-questions)
   - [Citation](#citation)
