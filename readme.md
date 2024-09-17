@@ -13,7 +13,7 @@ We are excited to announce the release of Trust-Score evaluation datasets and TR
 
 ## Overview
 
-LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, TRUST-SCORE, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose Trust-Align, a framework to align LLMs for higher TRUST-SCORE. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA (↑10.7), QAMPARI (↑29.2), and ELI5 (↑14.9). 
+LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, Trust-Score, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose Trust-Align, a framework to align LLMs for higher Trust-Score. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA (↑10.7), QAMPARI (↑29.2), and ELI5 (↑14.9). 
 
 ## Quick Links
 
@@ -44,9 +44,9 @@ conda activate cite
 
 ## Data
 
-TRUST-SCORE evaluation dataset is available [here]() and also on [Huggingface]().
+Trust-Score evaluation dataset is available [here]() and also on [Huggingface]().
 
-TRUST-ALGIN training dataset is also available [here]() and also on [Huggingface]().
+Trust-Align training dataset is also available [here]() and also on [Huggingface]().
 
 Our data included top-100 DPR/GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5. We also provide reranked oracle retrieval results, where top-5 passages can achieve the same recall as the original top-100 recall.
 
