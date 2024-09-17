@@ -1,26 +1,26 @@
 # Measuring and Enhancing Trustworthiness of LLMs in RAG through Grounded Attributions and Learning to Refuse
 
-> 📣 We are releasing TRUST-SCORE, a holistic evaluation of
+> 📣 We are releasing Trust-Score, a holistic evaluation of
 the trustworthiness of LLMs in a RAG framework, and the Trust-Align framework that aligns LLMs for higher Trust-Score. 
 [Paper]() | [Website]()
 
-We are excited to announce the release of Trust-Score evaluation datasets and TRUST-ALIGN alignment datasets:
+We are excited to announce the release of Trust-Score evaluation datasets and Trust-Align alignment datasets:
 
 1) **[Trust-Score]()**: It features calibrated questions and refusals to measure the model's trustworthiness.
 
-2) **[Trust-Align]()**: Ehance the model's trustworthiness with high-quality synthesized cited responses.
+2) **[Trust-Align]()**: Enhance the model's trustworthiness with high-quality synthesized cited responses.
 
 
 ## Overview
 
-LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, TRUST-SCORE, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose Trust-Align, a framework to align LLMs for higher TRUST-SCORE. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA (↑10.7), QAMPARI (↑29.2), and ELI5 (↑14.9). 
+LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, Trust-Score, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose Trust-Align, a framework to align LLMs for higher Trust-Score. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA (↑10.7), QAMPARI (↑29.2), and ELI5 (↑14.9). 
 
 ## Quick Links
 
   - [Requirements](#requirements)
   - [Data](#data)
   - [Trust-Score](#trust-score)
-  - [Trust-Align](#trust-algin)
+  - [Trust-Align](#trust-align)
   - [Bug or Questions](#bug-or-questions)
   - [Citation](#citation)
 
@@ -44,18 +44,18 @@ conda activate cite
 
 ## Data
 
-TRUST-SCORE evaluation dataset is available [here]() and also on [Huggingface]().
+Trust-Score evaluation dataset is available [here]() and also on [Huggingface]().
 
-TRUST-ALGIN training dataset is also available [here]() and also on [Huggingface]().
+Trust-Align training dataset is also available [here]() and also on [Huggingface]().
 
-Our data included top-100 DPR/GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5. We also provide reranked oracle retrieval results, where top-5 passages can achieve the same recall as the original top-100 recall.
+Our data includes top-100 DPR/GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5. We also provide reranked oracle retrieval results, where top-5 passages can achieve the same recall as the original top-100 recall.
 
 
 ## Trust-Score
 
 **Trust-Score** is a more reliable and comprehensive measure of an LLM's capabilities for RAG, covering the following aspects: Does the LLM correctly identify answerable questions? Are the responses grounded in the provided documents, i.e., do the citations support the claims in the ground-truth response? And are the citations relevant?
 
-<img src="assets/trust_score.png" alt="TRUST-SCORE" width="100%">
+<img src="assets/trust_score.png" alt="Trust-Score" width="100%">
 
 
 ### Eval Data Preparation
@@ -127,7 +127,7 @@ The file contains a list of JSON dictionaries with the following fields:
   ]
   ```
   
-  - `rec_score` - A recall score indicates the percentage of answers entailed by the document.
+  - `rec_score` - A recall score indicating the percentage of answers entailed by the document.
   
   Example:
 
@@ -137,7 +137,7 @@ The file contains a list of JSON dictionaries with the following fields:
 
 ### Evaluation Pipeline
 
-You can easily evaluate your model based on the formatted evaluation dataset by the following code:
+You can easily evaluate your model based on the formatted evaluation dataset by running the following code:
 
 ``` python
 from utils import RUN_Config
@@ -170,7 +170,7 @@ print(score)
 
 ## Trust-Align
 
-<img src="assets/trust_align.png" alt="TRUST-SCORE" width="100%">
+<img src="assets/trust_align.png" alt="Trust-Align" width="100%">
 
 ### Preparation
 
@@ -214,7 +214,7 @@ cd TRUST_ALIGN/positives_synthesis
 sh gen_ans.sh
 ```
 
-In `en_ans.sh`, please specify the `--data_file` with the path to your dataset.
+In `gen_ans.sh`, please specify the `--data_file` with the path to your dataset.
 
 To get positive responses with citations, run the following code:
 

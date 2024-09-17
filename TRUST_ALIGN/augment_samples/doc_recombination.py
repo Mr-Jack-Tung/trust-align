@@ -140,6 +140,16 @@ def pad_documents(indices, max_padding=15):
     return combined_indices
 
 def select_elements(tuples_list, num_selections):
+    """
+    Given a set of patterns, create a final list of patterns that has num_selections number of patterns and where every valid pattern appears at least once.
+
+    Args:
+        tuples_list (list[tuple]): List of tuples where each tuple contains an entailment pattern
+        num_selections (int): number of combinations to make
+    
+    Returns:
+        result (list[tuples]): List of num_selections number of tuples containing entailment patterns.  
+    """
     # Ensure each element is selected at least once
     num_additional_selections = num_selections - len(tuples_list)
     if num_additional_selections > 0:
@@ -151,21 +161,27 @@ def select_elements(tuples_list, num_selections):
     return result
 
 def get_valid_combinations(valid_docs, k=3):
-    # valid_docs: filtered_answers_found
+    """
+    Get k combinations of valid documents. Each combination must satisfy the following conditions:
+    (1) Be unique in doc idx and also doc entailment pattern. 
+    (2) k combinations of valid documents must also cover as diverse a pattern as possible. For example, 
+    if the set of 15 valid docs can form [1,1,0], [1,0,0], [0,1,0], then these three patterns must appear at least once.
+    
+    Args:
+        valid_docs (list[tuple(int, tuple)]): List of tuples where each tuple contains the index of the valid doc and also the entailment pattern of that doc.
+        k (int): number of combinations to make
+    
+    Returns:
+        valid_combinations (list[list]): List of lists containing indices of valid docs, padded with 200 i there are more than 4*k invalid docs.
+        valid_metadata (dataframe): Rows of dataframe containing selected pattern. Dataframe contains Indices, Bitwise OR Result, Weight
+    """
 
-    # Create tuples with index, replacing index with 0 if the answers_found array is all zeros
     combinations = list(itertools.combinations(valid_docs, 5))
-
-    # Filter unique combinations
     unique_combinations = list(set(combinations))
+    formatted_combinations = [(tuple(idx for idx, _ in comb), [np.array(arr) for _, arr in comb]) for comb in unique_combinations] # Convert back to numpy arrays for future bitwise_or operations
 
-    # Convert back to numpy arrays for future bitwise_or operations
-    formatted_combinations = [(tuple(idx for idx, _ in comb), [np.array(arr) for _, arr in comb]) for comb in unique_combinations]
-
-    # Extract indices and apply bitwise_or to the arrays
     indices_list = []
     bitwise_or_list = []
-
     for indices, arrays in formatted_combinations:
         if all(index == 200 for index in indices):
             continue
@@ -173,7 +189,6 @@ def get_valid_combinations(valid_docs, k=3):
         indices_list.append(indices)
         bitwise_or_list.append(bitwise_or_result)
 
-    # Create a DataFrame to display the results
     df = pd.DataFrame({
         'Indices': indices_list,
         'Bitwise OR Result': bitwise_or_list
@@ -215,11 +230,22 @@ def get_valid_combinations(valid_docs, k=3):
     return valid_combinations, valid_metadata
 
 def pad_invalid_docs(valid_combinations, invalid_doc_indices, documents):
-    # print(f'step1: {len(invalid_doc_indices)=}')
+    """
+    Fill the remaining empty slots (represented by 200) with invalid documents. Filling strategy is as follows:
+    (1) From the 50 docs most similar to question, fill each combination with docs most similar to existing valid docs. Fill without replacement
+    (2) Repeat for every combination
+
+    Args:
+        valid_combinations (list[list]): List of list containing valid doc idx, padded with 200 representing slots for invalid docs
+        invalid_doc_indices (list): List of index of top 50 invalid docs most similar to question
+        documents (list[dict]): List of dicts containing actual document content
+    
+    Returns:
+        final_combination (list[list]): List of lists containing document idxs
+    """
     final_combination = []
     for combination in valid_combinations:
         invalid_documents = [documents[idx] for idx in invalid_doc_indices]
-        # print(f'{len(invalid_documents)=}')
         searcher = SearcherWithinDocs(invalid_documents, "tfidf")
 
         num_invalid = combination.count(200)
@@ -231,7 +257,6 @@ def pad_invalid_docs(valid_combinations, invalid_doc_indices, documents):
         query_docs = [documents[i] for i in combination if i!=200]
         top_invalid_ids = searcher.search(query_docs, num_invalid)
         top_invalid = [invalid_doc_indices[i] for i in top_invalid_ids]
-        # print(f'{len(top_invalid)=}')
         [invalid_doc_indices.remove(x) for x in top_invalid]
         
         new_combination = []
@@ -241,10 +266,19 @@ def pad_invalid_docs(valid_combinations, invalid_doc_indices, documents):
             else:
                 new_combination.append(top_invalid.pop(0))
         final_combination.append(new_combination)
-    # print("======")
     return final_combination
 
 def get_top50_invalid_docs(invalid_doc_indices, documents):
+    """
+    Get top 50 invalid docs most similar to question.
+
+    Args:
+        invalid_doc_indices (list): List containing idx of invalid documents
+        documents (list[dict]): List of dict containing actual document content
+    
+    Returns:
+        filtered_invalid_doc_indices (list): Indices of top 50 invalid docs most similar to question.
+    """
     invalid_doc_indices_score = []
     for idx in invalid_doc_indices:
         invalid_doc_indices_score.append((idx, documents[idx]['score']))
@@ -254,8 +288,15 @@ def get_top50_invalid_docs(invalid_doc_indices, documents):
     return filtered_invalid_doc_indices
 
 def get_invalid_combinations(invalid_docs, k=3):
-    # print(f'{len(invalid_docs)=}')
-    # print(f'{len(invalid_docs)//5=}')
+    """
+    Get k combinations of docs that are all invalid.
+
+    Args:
+        invalid_docs (list): List of idx of invalid documents
+    
+    Returns:
+        invalid_combination (list[list]): List of indices of invalid documents
+    """
     invalid_combination = []
     if len(invalid_docs) >= 5*k:
         for i in range(k):
@@ -269,10 +310,11 @@ def get_invalid_combinations(invalid_docs, k=3):
             [invalid_docs.remove(el) for el in combination]
     else:
         logger.warning(f"You have {len(invalid_docs)} invalid docs. This is insufficient to make invalid doc combination.")
+        logger.debug(f'{invalid_docs=}')
     
     return invalid_combination
 
-def process_questions(data, label):
+def process_questions(data, k = 3, label = None):
     """
     Process each question in the data to find new combination of documents.
     
@@ -288,8 +330,7 @@ def process_questions(data, label):
                        'more than 15 valid docs': 0}
     metadata = {}
     question_metadata = []
-    less_than_4 = 0
-    eq_4 = 0
+    less_than_k, eq_k = 0, 0
 
     for question_idx in tqdm(range(len(data)), desc=f"Processing {label} questions"):
         q_metadata = {}
@@ -305,8 +346,8 @@ def process_questions(data, label):
         valid_doc_indices = [idx for idx in np.where(~np.all(all_answers_found == 0, axis=1))[0]]
         invalid_doc_indices = [idx for idx in np.where(np.all(all_answers_found == 0, axis=1))[0]]
         
-        if len(invalid_doc_indices) < 4:
-            logger.warn(f"You have less than 4 invalid docs. # invalid docs: {len(invalid_doc_indices)}")
+        if len(invalid_doc_indices) < 4*k:
+            logger.warning(f"You have less than {4*k} invalid docs. # invalid docs: {len(invalid_doc_indices)}. No invalid docs will be added. Only pad with {len(invalid_doc_indices)//k} 200.")
 
         if len(valid_doc_indices) == 0:
             base_data_stats['invalid qns'] += 1
@@ -318,26 +359,37 @@ def process_questions(data, label):
             base_data_stats['more than 15 valid docs'] += 1
             doc_indices_list = random.sample(valid_doc_indices, 15)
         
-        doc_indices_list += [200 for i in range(min(4, len(invalid_doc_indices)//4))] # in case there are less than 4 invalid docs
+        doc_indices_list += [200 for i in range(min(k, len(invalid_doc_indices)//k))] #  do not add any invalid docs in case there are less than 4*k invalid docs
+        
+        if len(invalid_doc_indices) < 4*k:
+            logger.debug(f"{doc_indices_list=}")
 
         # Filter answers_found for the selected document indices
         filtered_answers_found = [all_answers_found[idx] if idx != 200 else np.zeros(len(all_answers_found[valid_doc_indices[0]]), dtype=int) for idx in doc_indices_list]
         doc_list = [(idx, tuple(arr)) for idx, arr in zip(doc_indices_list, filtered_answers_found)]
         
-        valid_combinations, valid_metadata = get_valid_combinations(doc_list, k=4)
-        assert len(valid_combinations) <= 4, "You have more combinations than specified."
+        valid_combinations, valid_metadata = get_valid_combinations(doc_list, k)
+        
+        if len(invalid_doc_indices) < 4*k:
+            logger.debug(f"{valid_combinations=}")
+
+        assert len(valid_combinations) <= k, "You have more combinations than specified."
 
         if (len(valid_doc_indices) == 1) or (len(valid_doc_indices) == 2):
-            less_than_4+=1
-            assert len(valid_combinations) < 4, "error"
+            less_than_k+=1
+            assert len(valid_combinations) < k, "error"
         else:
-            eq_4+=1
+            eq_k+=1
 
         # select top 50 docs with highest similarity to question
         top50_invalid_doc_indices = get_top50_invalid_docs(invalid_doc_indices, documents)
+        if len(invalid_doc_indices) < 4*k:
+            logger.debug(f"{top50_invalid_doc_indices=}")
     
         final_combination_valid = pad_invalid_docs(valid_combinations, top50_invalid_doc_indices, documents)
-        final_combination_invalid = get_invalid_combinations(top50_invalid_doc_indices, k=3)
+        if len(invalid_doc_indices) < 4*k:
+            logger.debug(f"{final_combination_valid=}")
+        final_combination_invalid = get_invalid_combinations(top50_invalid_doc_indices, k)
         results[question_idx] = final_combination_valid + final_combination_invalid
 
         # log stats about data
@@ -361,7 +413,7 @@ def process_questions(data, label):
     
     metadata['base_data_stats'] = base_data_stats
     metadata['question_metadata'] = question_metadata
-    metadata['extra_stats'] = {'num_less_than_4' : less_than_4, 'num_eq_4' : eq_4}
+    metadata['extra_stats'] = {'num_less_than_k' : less_than_k, 'num_eq_k' : eq_k}
 
     # converted_metadata = convert_to_python_int(metadata)
     # print(json.dumps(converted_metadata, indent=4))
@@ -434,7 +486,7 @@ def save_data_to_json(data, directory_path, file_name, is_metadata = False):
         try:
             with open(file_path, 'r') as json_file:
                 loaded_data = json.load(json_file)
-                print(loaded_data == serializable_data) 
+                # print(loaded_data == serializable_data) 
         except (IOError, json.JSONDecodeError, AssertionError) as e:
             logger.error(f"Error verifying file integrity: {e}")
             return False
@@ -508,26 +560,6 @@ def check_types(data, parent_key=''):
         assert not isinstance(data, np.int64), "Variable should not be int64"
         print(f"Key: {parent_key}, Type: {type(data)}")
 
-
-# ### TESTING CODE ###
-# with open("/home/shanghong/Cite-PM/data/eli5_doc.json") as f:
-#     data = json.load(f)[789:]
-
-# random.seed(0)
-# np.random.seed(0)
-
-# final_combination, metadata = process_questions(data, "eli5")
-# logger.info(f"# of invalid questions: {metadata['base_data_stats']['invalid qns']}, # of qns with less than 15 docs: {metadata['base_data_stats']['less than 15 valid docs']}, # of qns with more than 15 docs: {metadata['base_data_stats']['more than 15 valid docs']}")
-# combined_data = generate_combinations_data(data, final_combination, "eli5")
-
-# if "/home/shanghong/Cite-PM/dataset_b/asqa_testing_dataset_b_docs.json":
-#     directory_path = os.path.dirname("/home/shanghong/Cite-PM/data/dataset_b/asqa_testing_dataset_b_docs.json")
-#     file_name = os.path.basename("/home/shanghong/Cite-PM/data/dataset_b/asqa_testing_dataset_b_docs.json")
-#     save_data_to_json(combined_data, directory_path, file_name)
-#     metadata_file_name = os.path.basename("/home/shanghong/Cite-PM/data/dataset_b/metadata.json")
-#     save_data_to_json(metadata, directory_path, metadata_file_name)
-# ### TESTING CODE ###
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Document selection")
     parser.add_argument("--dataset_name", type=str, help="Name of the dataset (ASQA, QAMPARI, ELI5)")
@@ -545,7 +577,7 @@ if __name__ == "__main__":
     with open(args.data_file) as f:
         data = json.load(f)
 
-    final_combination, metadata = process_questions(data, args.dataset_name)
+    final_combination, metadata = process_questions(data, k = 10, label = args.dataset_name)
     logger.info(f"# of invalid questions: {metadata['base_data_stats']['invalid qns']}, # of qns with less than 15 docs: {metadata['base_data_stats']['less than 15 valid docs']}, # of qns with more than 15 docs: {metadata['base_data_stats']['more than 15 valid docs']}")
     combined_data = generate_combinations_data(data, final_combination, args.dataset_name)
     # check_types(metadata)
