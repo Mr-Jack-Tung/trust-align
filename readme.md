@@ -255,7 +255,7 @@ If you have any questions related to the code or the paper, feel free to email M
 
 ## Citation
 
-Please cite our paper if you use ALCE in your work:
+Please cite our paper if you use Trust-align in your work:
 
 ```bibtex
 
