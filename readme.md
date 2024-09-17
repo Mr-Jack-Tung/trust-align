@@ -13,8 +13,7 @@ We are excited to announce the release of Trust-Score evaluation datasets and TR
 
 ## Overview
 
-LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, \metric{}, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose \method{}, a framework to align LLMs for higher \metric{}. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA ($\uparrow$ 10.7) QAMPARI ($\uparrow$ 29.2) ELI5 ($\uparrow$ 14.9), respectively. 
-
+LLMs are an integral part of retrieval-augmented generation (RAG) systems. While many studies focus on evaluating the quality of end-to-end RAG systems, there is a lack of research on understanding the appropriateness of an LLM for the RAG task. Thus, we introduce a new metric, TRUST-SCORE, that provides a holistic evaluation of the trustworthiness of LLMs in an RAG framework. We show that various prompting methods, such as in-context learning, fail to adapt LLMs effectively to the RAG task. Thus, we propose Trust-Align, a framework to align LLMs for higher TRUST-SCORE. LLaMA-3-8b, aligned with our method, significantly outperforms open-source LLMs of comparable sizes on ASQA (↑10.7), QAMPARI (↑29.2), and ELI5 (↑14.9). 
 
 ## Quick Links
 
