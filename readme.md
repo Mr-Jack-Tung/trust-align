@@ -1,7 +1,7 @@
 # Measuring and Enhancing Trustworthiness of LLMs in RAG through Grounded Attributions and Learning to Refuse
 
 > 📣 We are releasing TRUST-SCORE, a holistic evaluation of
-the trustworthiness of LLMs in a RAG framework, and Trust-Align framework that aligns LLMs for higher TRUST-SCORE. 
+the trustworthiness of LLMs in a RAG framework, and the Trust-Align framework that aligns LLMs for higher Trust-Score. 
 [Paper]() | [Website]()
 
 We are excited to announce the release of Trust-Score evaluation datasets and TRUST-ALIGN alignment datasets:
