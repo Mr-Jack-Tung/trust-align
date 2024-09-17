@@ -52,7 +52,7 @@ TRUST-ALGIN training dataset is also available [here]() and also on [Huggingface
 Our data included top-100 DPR/GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5. We also provide reranked oracle retrieval results, where top-5 passages can achieve the same recall as the original top-100 recall.
 
 
-## Trust-Score-Eval
+## Trust-Score
 
 **Trust-Score** is a more reliable and comprehensive measure of an LLM's capabilities for RAG, covering the following aspects: Does the LLM correctly identify answerable questions? Are the responses grounded in the provided documents, i.e., do the citations support the claims in the ground-truth response? And are the citations relevant?
 
