@@ -6,7 +6,7 @@ the trustworthiness of LLMs in a RAG framework, and TRUST-ALIGN framework that a
 
 We are excited to announce the release of TRUST-SCORE evaluation datasets and TRUST-ALIGN alignment datasets:
 
-1) **[TRUST-SCORE-Eval]()**: It features calibrated questions and refusals to measure the model's trustworthiness.
+1) **[TRUST-SCORE]()**: It features calibrated questions and refusals to measure the model's trustworthiness.
 
 2) **[TRUST-ALGIN]()**: Ehance the model's trustworthiness with high-quality synthesized cited responses.
 
