@@ -1,16 +1,18 @@
 import logging
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-import torch
 import json
-import re
 import os
+import re
 import string
 import time
-
 from dataclasses import dataclass
-from typing import Optional, List, Literal
+from typing import List, Literal, Optional
+
+import torch
+
 
 def normalize_answer(s):
     def remove_articles(text):
