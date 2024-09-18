@@ -2,13 +2,13 @@
 
 > 📣 We are releasing Trust-Score, a holistic evaluation of
 the trustworthiness of LLMs in a RAG framework, and the Trust-Align framework that aligns LLMs for higher Trust-Score. 
-[Paper]() | [Website]()
+[Paper](https://arxiv.org/abs/2409.11242)
 
 We are excited to announce the release of Trust-Score evaluation datasets and Trust-Align alignment datasets:
 
-1) **[Trust-Score]()**: It features calibrated questions and refusals to measure the model's trustworthiness.
+1) **[Trust-Score](https://huggingface.co/datasets/declare-lab/Trust-Score/tree/main/Trust-Score)**: It features calibrated questions and refusals to measure the model's trustworthiness.
 
-2) **[Trust-Align]()**: Enhance the model's trustworthiness with high-quality synthesized cited responses.
+2) **[Trust-Align](https://huggingface.co/datasets/declare-lab/Trust-Score/tree/main/Trust-Align)**: Enhance the model's trustworthiness with high-quality synthesized cited responses.
 
 
 ## Overview
@@ -44,11 +44,11 @@ conda activate cite
 
 ## Data
 
-Trust-Score evaluation dataset is available [here]() and also on [Huggingface]().
+Trust-Score evaluation dataset is available on [Huggingface](https://huggingface.co/datasets/declare-lab/Trust-Score/tree/main/Trust-Score).
 
-Trust-Align training dataset is also available [here]() and also on [Huggingface]().
+Trust-Align training dataset is also available [Huggingface](https://huggingface.co/datasets/declare-lab/Trust-Score/tree/main/Trust-Align).
 
-Our data includes top-100 DPR/GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5. We also provide reranked oracle retrieval results, where top-5 passages can achieve the same recall as the original top-100 recall.
+Our evaluation data includes top-100 GTR retrieved results for ASQA, QAMPARI and ExpertQA, and top-100 BM25 retrieved results for ELI5.
 
 
 ## Trust-Score
@@ -257,5 +257,13 @@ If you have any questions related to the code or the paper, feel free to email M
 Please cite our paper if you use Trust-align in your work:
 
 ```bibtex
-
+@misc{song2024measuringenhancingtrustworthinessllms,
+      title={Measuring and Enhancing Trustworthiness of LLMs in RAG through Grounded Attributions and Learning to Refuse}, 
+      author={Maojia Song and Shang Hong Sim and Rishabh Bhardwaj and Hai Leong Chieu and Navonil Majumder and Soujanya Poria},
+      year={2024},
+      eprint={2409.11242},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2409.11242}, 
+}
 ```
